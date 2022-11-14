@@ -47,6 +47,7 @@ summary
 Input file format
 To make parsing easier, you may assume that input files will follow this format:
 
+```
 title:My example feed
 subtitle:for demonstration purposes
 link:www.cs.adelaide.edu.au
@@ -65,6 +66,7 @@ link:www.cs.adelaide.edu.au/users/third/ds/14ds2s1
 id:urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6b
 updated:2015-08-07T18:29:02Z
 summary:here's another summary entry which a reader would normally use to work out if they wanted to read some more. It's quite handy.
+```
 
 Your GET client will start up, read the command line to find the server name and port number (in URL format) and will send a GET request for the ATOM feed. This feed will then be stripped of XML and displayed, one line at a time, with the attribute and its value. Your GET client's main method will reside in a file called GETClient.java. Possible formats for the server name and port number include "http://servername.domain.domain:portnumber", "http://servername:portnumber" (with implicit domain information) and "servername:portnumber" (with implicit domain and protocol information).
 
@@ -73,6 +75,7 @@ You should display the output so that it is easy to read but you do not need to 
 ## PUT message format
 Your PUT message should take the format:
 
+```
 PUT /atom.xml HTTP/1.1
 User-Agent: ATOMClient/1/0
 Content-Type: (You should work this one out)
@@ -83,6 +86,8 @@ Content-Length: (And this one too)
 (And then your file of data)
 ...
 </feed>
+```
+
 Your content server will need to confirm that it has received the correct acknowledgment from the server and then check to make sure that the information is in the feed as it was expecting. It must also support Lamport clocks.
 
 
