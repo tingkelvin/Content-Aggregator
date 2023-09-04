@@ -3,7 +3,7 @@
 
 The main Objectives of this project are:
 
-An ATOM server (or aggregation server) that responds to requests for feeds and also accepts feed updates from clients. The aggregation server will store feed information persistently, only removing it when the content server who provided it is no longer in contact, or when the feed item is not one of the most recent 20.
+An ATOM server (or aggregation server) that responds to requests for feeds and also accepts feed updates from clients. The aggregation server will store feed information persistently, only removing it when the content server who provided it is no longer in contact or when the feed item is not one of the most recent 20.
 
 A client that makes an HTTP GET request to the server and then displays the feed data, stripped of its XML information.
 
@@ -11,27 +11,27 @@ A CONTENT SERVER that makes an HTTP PUT request to the server and then uploads a
 
 ## Requirement
 
-Multiple clients may attempt to GET simultaneously and are required to GET the aggregated feed that is correct for the Lamport clock adjusted time if interleaved with any PUTs. Hence, if A PUT, a GET, and another PUT arrive in that sequence then the first PUT must be applied and the content server advised, then the GET returns the updated feed to the client then the next PUT is applied. In each case, the participants will be guaranteed that this order is maintained if they are using Lamport clocks.
+Multiple clients may attempt to stimulate GET requests simultaneously, and the GET request must return the aggregated feed that is ordered by the Lamport clock if interleaved with any PUTs. Hence, if A PUT, a GET, and another PUT arrive in that sequence, then the first PUT must be applied and the content server advised, then the GET returns the updated feed to the client, and then the next PUT is applied. In each case, the participants will be guaranteed that this order is maintained if they are using Lamport clocks.
 
-Multiple content servers may attempt to simultaneously PUT. This must be serialised and the order maintained by Lamport clock timestamp.
+Multiple content servers may attempt to simultaneously PUT. This must be serialised, and the order must be maintained by Lamport clock timestamp.
 
-Aggregation server will expire and remove any content from a content server that it has not communicated within the last 12 seconds. You may choose the mechanism for this but you must consider efficiency and scale.
+The aggregation server will expire and remove any content from a content server that it has not communicated with within the last 12 seconds. You may choose the mechanism for this, but you must consider efficiency and scale.
 
-All elements must be capable of implementing Lamport clocks, for synchronization and coordination purposes.
+All elements must be capable of implementing Lamport clocks for synchronization and coordination purposes.
 
 ## Aggregation Server
-To keep things simple, we will assume that there is one file in your filesystem which contains a list of entries and where are they come from. It does not need to be an ATOM format, but it must be able to convert to a standard ATOM file when the client sends a GET request. However, this file must survive the server crashing and re-starting, including recovering if the file was being updated when the server crashed! Your server should restore it as was before re-starting or a crash. You should, therefore, be thinking about the PUT as a request to handle the information passed in, possibly to an intermediate storage format, rather than just as overwriting a file. This reflects the subtle nature of PUT - it is not just a file write request! You should check the feed file provided from a PUT request to ensure that it is valid. The file details that you can expect are detailed in the Content Server specification.
+To keep things simple, we will assume that there is one file in your filesystem that contains a list of entries and where they come from. It does not need to be an ATOM format, but it must be able to convert to a standard ATOM file when the client sends a GET request. However, this file must survive the server crashing and restarting, including recovering if the file was being updated when the server crashed! Your server should restore it as was before re-starting or a crash. You should, therefore, be thinking about the PUT as a request to handle the information passed in, possibly to an intermediate storage format, rather than just as overwriting a file. This reflects the subtle nature of PUT - it is not just a file write request! You should check the feed file provided from a PUT request to ensure that it is valid. The file details that you can expect are detailed in the Content Server specification.
 
 All the entities in your system must be capable of maintaining a Lamport clock.
 
-The first time your ATOM feed is created, you should return status 201 - HTTP_CREATED. If later uploads are ok, you should return status 200. (This means, if a Content Server first connects to the Aggregation Server, then return 201 as succeed code, then before the content server lost connection, all other succeed response should use 200). Any request other than GET or PUT should return status 400 (note: this is not standard but to simplify your task). Sending no content to the server should cause a 204 status code to be returned. Finally, if the ATOM XML does not make sense you may return status code 500 - Internal server error.
+The first time your ATOM feed is created, you should return status 201 - HTTP_CREATED. If later uploads are ok, you should return status 200. (This means if a Content Server first connects to the Aggregation Server, then return 201 as succeed code, then before the content server loses connection, all other successful responses should use 200). Any request other than GET or PUT should return status 400 (note: this is not standard, but to simplify your task). Sending no content to the server should cause a 204 status code to be returned. Finally, if the ATOM XML does not make sense, you may return status code 500 - Internal server error.
 
-Your server is designed to stay current and will remove any items in the feed that have come from content servers which it has not communicated with for 12 seconds. How you do this is up to you but please be efficient!
+Your server is designed to stay current and will remove any items in the feed that have come from content servers that it has not communicated with for 12 seconds. How you do this is up to you, but please be efficient!
 
 ## GET client
 
 Your Content Server
-Your content server will start up, reading two parameters from the command line, where the first is the server name and port number (as for GET) and the second is the location of a file in the file system local to the Content Server (It is expected that this file located in your project folder). The file will contain a number of fields from the ATOM format that are to be assembled into an ATOM XML feed and then uploaded to the server. You may assume that all fields are text and that there will be no embedded HTML or XHMTL. The list of ATOM elements that you need to support are:
+Your content server will start up, reading two parameters from the command line, where the first is the server name and port number (as for GET), and the second is the location of a file in the file system local to the Content Server (It is expected that this file located in your project folder). The file will contain a number of fields from the ATOM format that are to be assembled into an ATOM XML feed and then uploaded to the server. You may assume that all fields are text and that there will be no embedded HTML or XHMTL. The list of ATOM elements that you need to support are:
 
 title
 subtitle
